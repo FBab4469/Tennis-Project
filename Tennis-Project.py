@@ -5,9 +5,11 @@ import os
 # مسیر فایل zip اصلی و مسیر استخراج
 zip_path = r'C:\Users\Fatemeh\Downloads\data.zip'
 extract_path = r'C:\Users\Fatemeh\Desktop\Tennis-Project'
+output_csv_path = r'C:\Users\Fatemeh\Desktop\Tennis-Project\CSV_Files'
 
 # اطمینان از وجود پوشه مقصد
 os.makedirs(extract_path, exist_ok=True)
+os.makedirs(output_csv_path, exist_ok=True)
 
 # استخراج فایل zip اصلی
 with zipfile.ZipFile(zip_path, 'r') as zip_ref:
@@ -60,6 +62,12 @@ for file in extracted_files:
             print(f"Error opening {inner_zip_path}: {e}")
             continue
 
+        # لیست فایل‌های استخراج شده از زیپ داخلی
+        inner_extracted_files = os.listdir(inner_extract_path)
+        print(f"Extracted files from {inner_zip_path}:")
+        for inner_file in inner_extracted_files:
+            print(inner_file)
+
         for root, _, inner_files in os.walk(inner_extract_path):
             for inner_file in inner_files:
                 if inner_file.endswith('.csv'):
@@ -73,21 +81,21 @@ for file in extracted_files:
                     except Exception as e:
                         print(f"Error reading {file_path}: {e}")
 
-# تنظیمات نمایش برای نمایش تمامی سطرها
-pd.set_option('display.max_rows', None)
-pd.set_option('display.max_columns', None)
+# ایجاد دیتافریم‌های خالی برای جداولی که پیدا نشدند
+for table_name in expected_tables:
+    if expected_tables[table_name] is None:
+        print(f"DataFrame for {table_name} not found, creating empty DataFrame.")
+        expected_tables[table_name] = pd.DataFrame()
 
-# نمایش تمامی سطرهای دیتافریم‌ها
+# ذخیره تمامی دیتافریم‌ها به فایل‌های CSV
 for table_name, df in expected_tables.items():
-    if df is not None:
-        print(f"DataFrame from {table_name}:")
-        print(df)
-    else:
-        print(f"DataFrame for {table_name} not found.")
+    output_file_path = os.path.join(output_csv_path, f"{table_name}.csv")
+    df.to_csv(output_file_path, index=False)
+    print(f"Saved DataFrame for {table_name} to {output_file_path}")
 
 # چاپ مسیر فایل‌های CSV
 print("\nAll CSV file paths:")
-for root, _, files in os.walk(extract_path):
+for root, _, files in os.walk(output_csv_path):
     for file in files:
         if file.endswith('.csv'):
             file_path = os.path.join(root, file)
