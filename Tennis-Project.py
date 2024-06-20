@@ -73,11 +73,15 @@ for file in extracted_files:
                     except Exception as e:
                         print(f"Error reading {file_path}: {e}")
 
-# نمایش نمونه‌ای از دیتافریم‌ها
+# تنظیمات نمایش برای نمایش تمامی سطرها
+pd.set_option('display.max_rows', None)
+pd.set_option('display.max_columns', None)
+
+# نمایش تمامی سطرهای دیتافریم‌ها
 for table_name, df in expected_tables.items():
     if df is not None:
         print(f"DataFrame from {table_name}:")
-        print(df.head())
+        print(df)
     else:
         print(f"DataFrame for {table_name} not found.")
 
